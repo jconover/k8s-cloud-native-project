@@ -19,7 +19,7 @@ WORKER1_IP="192.168.68.88"
 WORKER2_IP="192.168.68.83"
 POD_CIDR="10.244.0.0/16"
 SERVICE_CIDR="10.96.0.0/12"
-K8S_VERSION="1.33"
+K8S_VERSION="1.34.1"
 
 log() {
     echo -e "${GREEN}[$(date +'%Y-%m-%d %H:%M:%S')] $1${NC}"
@@ -145,8 +145,8 @@ install_kubernetes_tools() {
     log "Installing Kubernetes tools (kubeadm, kubelet, kubectl)..."
     
     # Add Kubernetes APT repository
-    curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-    echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+    curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.34/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+    echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.34/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
     
     # Install Kubernetes tools
     sudo apt-get update
@@ -239,11 +239,11 @@ verify_cluster() {
 install_helm() {
     log "Installing Helm..."
     
-    # Download and install Helm
-    curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
-    sudo apt-get update
-    sudo apt-get install -y helm
+    # Download and install Helm using the official install script
+    curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+    chmod 700 get_helm.sh
+    ./get_helm.sh
+    rm get_helm.sh
     
     # Verify Helm installation
     helm version
